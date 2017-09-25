@@ -19,4 +19,5 @@ void loop() {
   TmpData = TmpSensor.GetData();      //Get Temperature
   Com.SendTmpData(TmpData);           //Send Data
   delay(SENSING_TIME);                //Wait Sense Timing
+
 }

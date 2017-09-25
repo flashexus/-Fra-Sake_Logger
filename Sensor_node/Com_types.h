@@ -6,6 +6,7 @@
 typedef struct{
   STR   HeaderData;
   FLOAT TmpData;
+  STR SensorID;
 }COM_TMP_DATA;    //*end code = CRLF
 
 //---------------------------------------------------------------
