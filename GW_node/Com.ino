@@ -53,19 +53,20 @@ BOOL COM::CheckRcvData(void) {
 //---------------------------------------------------------------
 BOOL COM::RecvTmpData(void)
 {
-  if(GetData() == true){  
+  if(GetAndRelayData() == true){  
     UnPackRxData();
   }
+    
   return ValidateRxData();
 }
 //---------------------------------------------------------------
 //全てのデータを受信仕切っていることを保証する
-BOOL COM::GetData(void) {
+BOOL COM::GetAndRelayData(void) {
   UINT rcv_data_cnt;
   rcv_data_cnt = 0;
   do{
     RxData_buffer[rcv_data_cnt] = Serial.read();
-    Serial.write((RxData_buffer[rcv_data_cnt]));  //for debug
+//    Serial.write((RxData_buffer[rcv_data_cnt])); //for debug
     rcv_data_cnt++;
 //  } while ( inputData[rcv_data_cnt] != -1 );
   } while ( rcv_data_cnt != Com.RxData_cnt );
@@ -76,14 +77,16 @@ BOOL COM::GetData(void) {
 //受信データを温度情報用のオブジェクトに展開する
 void COM::UnPackRxData(void){
 //ComRxData 構造体　←　Char配列
-  String tmp = (String (&RxData_buffer[0]));
-  memcpy( &ComRxData, &tmp,sizeof(COM_TMP_DATA) );
-  Serial.print(ComRxData);
+  ComRxData = (String (&RxData_buffer[0]));
 }
 //---------------------------------------------------------------
 //受信した温度情報用のオブジェクトをチェックする
 BOOL COM::ValidateRxData(void){
+
   return true;  
 }
-
+//---------------------------------------------------------------
+void COM::RelayComData(void){
+  Serial.print(ComRxData);
+}
 

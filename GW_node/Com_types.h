@@ -17,13 +17,14 @@ public:
   void SendTmpData(FLOAT SendData);
   BOOL RecvTmpData();
   BOOL CheckRcvData(void);
+  void RelayComData(void);
 private: 
   COM_TMP_DATA ComTxData;
   STR ComRxData;
   UINT RxData_cnt;
   CHAR RxData_buffer[MAX_DATA_SIZE];
   void PackTxData(FLOAT SendData);
-  BOOL GetData(void);
+  BOOL GetAndRelayData(void);
   void UnPackRxData(void);
   BOOL ValidateRxData(void);
 };
