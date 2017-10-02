@@ -1,34 +1,39 @@
-#include "arduino.h"
 #include "Com.h"
 //---------------------------------------------------------------
-#define BOUND_RATE      (9600)                 //GAMMA側の設定と合わせる必要があるためコンフィグにしない
+#define BOUND_RATE      (9600)                 //GAMMA,RaspPI側の設定と合わせる必要があるためコンフィグにしない
 
 COM Com;                                       //Instance
 //---------------------------------------------------------------
+///////////////////メンバ変数初期化//////////////////////////////
 COM::COM()
 {
-  RxData_cnt = 0;
-  
-  UINT roop_num;
-  for ( roop_num = 0; roop_num < MAX_DATA_SIZE; roop_num++) {
-    RxData_buffer[roop_num] = 0U;
-  }
+  //----------------メンバ初期化---------------------
+  RxData_cnt = 0U;
+  memset(&ComRxData,'\0',sizeof(ComRxData));
+  memset(RxData_buffer,'\0',MAX_DATA_SIZE);
 }
 //---------------------------------------------------------------
+///////////////////シリアル通信開始//////////////////////////////
 void COM::Start(void)
 {
+  //-----メソッドを使用して初期化する場合はこちらに記述する-------
     ComTxData.HeaderData = "AAAA";             //Set Header Data
     randomSeed(RANDOM_SEED_CH);    
     ComTxData.SensorID = String(random(
               ID_MIN_LIMIT,ID_MAX_LIMIT),HEX); //Set Sensor ID
+
+  //-----メソッドを使用して初期化する場合はこちらに記述する-------              
     Serial.begin(BOUND_RATE);                 //Start LoRa Commnucation
 }
 //---------------------------------------------------------------
+////////////////////送信データのパッキング////////////////////////
 void COM::PackTxData(FLOAT SendData)
 {
-    ComTxData.TmpData = SendData;            
+    //-----メソッドを使用して初期化する場合はこちらに記述する-----
+    ComTxData.TmpData = SendData;
 }
 //---------------------------------------------------------------
+////////////////温度データのシリアル送信//////////////////////////
 void COM::SendTmpData(FLOAT SendData)
 {
     PackTxData(SendData);                     //Set Tmp Data
@@ -38,7 +43,8 @@ void COM::SendTmpData(FLOAT SendData)
     Serial.println(ComTxData.SensorID);
 }
 //---------------------------------------------------------------
-BOOL COM::CheckRcvData(void) {
+//////////受信データがあればデータ数を格納、フラグTrue返却////////
+BOOL COM::CheckRcvData(void){
   UINT inputchar;
   BOOL Com_RcvData_flag = false;
 
@@ -51,42 +57,44 @@ BOOL COM::CheckRcvData(void) {
   return Com_RcvData_flag;
 }
 //---------------------------------------------------------------
-BOOL COM::RecvTmpData(void)
+///////受信データ取得後に展開し、バリデーション////////////////////
+BOOL COM::RcvTmpData(void)
 {
-  if(GetAndRelayData() == true){  
+  if(GetData() == true){  
     UnPackRxData();
-  }
-    
+  }    
   return ValidateRxData();
 }
 //---------------------------------------------------------------
-//全てのデータを受信仕切っていることを保証する
-BOOL COM::GetAndRelayData(void) {
+////////////全てのデータを受信仕切っていることを保証する///////////
+BOOL COM::GetData(void) {
   UINT rcv_data_cnt;
   rcv_data_cnt = 0;
   do{
-    RxData_buffer[rcv_data_cnt] = Serial.read();
+      RxData_buffer[rcv_data_cnt] = Serial.read();
 //    Serial.write((RxData_buffer[rcv_data_cnt])); //for debug
-    rcv_data_cnt++;
-//  } while ( inputData[rcv_data_cnt] != -1 );
-  } while ( rcv_data_cnt != Com.RxData_cnt );
-
-  return (!CheckRcvData());
+      rcv_data_cnt++;
+//  } while ( inputData[rcv_data_cnt] != -1 );    
+  } while ( rcv_data_cnt != Com.RxData_cnt );      //受信可能なデータ数を格納
+                                                   //ゴミデータは混ざらない想定
+  return (!CheckRcvData());                        //受信可能データがない場合True
 }
 //---------------------------------------------------------------
-//受信データを温度情報用のオブジェクトに展開する
+///////////受信データを温度情報用のオブジェクトに展開する//////////
 void COM::UnPackRxData(void){
 //ComRxData 構造体　←　Char配列
   ComRxData = (String (&RxData_buffer[0]));
 }
 //---------------------------------------------------------------
-//受信した温度情報用のオブジェクトをチェックする
+//////////受信した温度情報用のオブジェクトをチェックする///////////
 BOOL COM::ValidateRxData(void){
-
+  //ひとまず素通し
   return true;  
 }
 //---------------------------------------------------------------
+////////////////////シリアル通信の中継///////////////////////////
 void COM::RelayComData(void){
+  //中継機能は同じシリアルのチャンネル使用のみ対応
   Serial.print(ComRxData);
 }
 

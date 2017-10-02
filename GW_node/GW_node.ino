@@ -16,7 +16,7 @@ void GW_SendData(void) {
 //--------------------------------------------------
 void loop() {
   if (Com.CheckRcvData() == true){
-    if(Com.RecvTmpData() == true){
+    if(Com.RcvTmpData() == true){
       GW_SendData();
     }
   }    
