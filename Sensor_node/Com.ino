@@ -1,4 +1,3 @@
-#include "arduino.h"
 #include "Com.h"
 //---------------------------------------------------------------
 #define BOUND_RATE      (9600)
@@ -32,6 +31,8 @@ void COM::SendTmpData(FLOAT SendData)
     //--------------Send Packet--------------------
     Serial.print(ComTmpData.HeaderData);
     Serial.print(ComTmpData.TmpData);
-    Serial.println(ComTmpData.SensorID);
-    
+    Serial.println(ComTmpData.SensorID); 
 }
+//---------------------------------------------------------------
+
+

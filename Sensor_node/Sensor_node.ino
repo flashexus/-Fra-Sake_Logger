@@ -1,23 +1,26 @@
 #include "types.h"
 #include "Com.h"
 #include "TmpSensor.h"
+#include "Task_Sch.h"
 //---------------------------------------------------------------
-#define SENSING_TIME  (6000)
 #define LED_PIN       (13)
 //---------------------------------------------------------------
 void setup() {
-  // put your setup code here, to run once:
-  pinMode(LED_PIN, OUTPUT); //for debug
+  pinMode(LED_PIN, OUTPUT);           //for debug
   TmpSensor.Start();
   Com.Start();  
 }
 //---------------------------------------------------------------
 void loop() {
-  // put your main code here, to run repeatedly:
-  FLOAT TmpData;
-  
-  TmpData = TmpSensor.GetData();      //Get Temperature
-  Com.SendTmpData(TmpData);           //Send Data
-  delay(SENSING_TIME);                //Wait Sense Timing
-
+  digitalWrite(LED_PIN,HIGH);    
+  Task.sch();
+  digitalWrite(LED_PIN,LOW);  
+  delay(100);                         //スリープからの復帰時調整用時間（必須）
 }
+//---------------------------------------------------------------
+void Task_Sensing(void){
+  FLOAT TmpData; 
+  TmpData = TmpSensor.GetData();      //Get Temperature
+  Com.SendTmpData(TmpData);           //Send Data     
+}
+
