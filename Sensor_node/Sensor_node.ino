@@ -12,9 +12,9 @@ void setup() {
 }
 //---------------------------------------------------------------
 void loop() {
-  digitalWrite(LED_PIN,HIGH);    
+//  digitalWrite(LED_PIN,HIGH);    
   Task.sch();
-  digitalWrite(LED_PIN,LOW);  
+//  digitalWrite(LED_PIN,LOW);  
   delay(100);                         //スリープからの復帰時調整用時間（必須）
 }
 //---------------------------------------------------------------

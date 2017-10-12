@@ -1,6 +1,11 @@
 #include "Com.h"
-//---------------------------------------------------------------
+#include <EEPROM.h>
+
+//-------------------------FixedParameter----------------------------
 #define BOUND_RATE      (9600)                 //GAMMA,RaspPI側の設定と合わせる必要があるためコンフィグにしない
+#define ID_MIN_LIMIT    (0x1000)               //必ず4桁欲しいため
+#define ID_MAX_LIMIT    (0xFFFF)
+#define EEP_WRITE_WAIT  (100)
 
 COM Com;                                       //Instance
 //---------------------------------------------------------------
@@ -16,21 +21,17 @@ COM::COM()
 ///////////////////シリアル通信開始//////////////////////////////
 void COM::Start(void)
 {
-  //-----メソッドを使用して初期化する場合はこちらに記述する-------
-    ComTxData.HeaderData = "AAAA";             //Set Header Data
-    randomSeed(RANDOM_SEED_CH);    
-    ComTxData.SensorID = String(random(
-              ID_MIN_LIMIT,ID_MAX_LIMIT),HEX); //Set Sensor ID
-
-  //-----メソッドを使用して初期化する場合はこちらに記述する-------              
+    //-----メソッドを使用して初期化する場合はこちらに記述する-------
+    ComTmpData.HeaderData = TMP_DATA_HEADER;   //Set Header Data
+    ComTmpData.SensorID = GetIDData();         //Set Sensor ID
+    
     Serial.begin(BOUND_RATE);                 //Start LoRa Commnucation
 }
 //---------------------------------------------------------------
 ////////////////////送信データのパッキング////////////////////////
 void COM::PackTxData(FLOAT SendData)
 {
-    //-----メソッドを使用して初期化する場合はこちらに記述する-----
-    ComTxData.TmpData = SendData;
+    ComTmpData.TmpData = SendData;            
 }
 //---------------------------------------------------------------
 ////////////////温度データのシリアル送信//////////////////////////
@@ -38,9 +39,27 @@ void COM::SendTmpData(FLOAT SendData)
 {
     PackTxData(SendData);                     //Set Tmp Data
     //--------------Send Packet--------------------
-    Serial.print(ComTxData.HeaderData);
-    Serial.print(ComTxData.TmpData);
-    Serial.println(ComTxData.SensorID);
+    Serial.print(ComTmpData.HeaderData);
+    Serial.print(ComTmpData.TmpData);
+    Serial.println(ComTmpData.SensorID); 
+}
+//---------------------------------------------------------------
+STR COM::GetIDData(void)
+{
+  UINT Node_ID_INT;
+  STR Node_ID;
+  
+  EEPROM.get(NODE_ID_ADDRESS,Node_ID_INT);
+   
+  if(Node_ID_INT == EEP_BRANK_DATA){
+    randomSeed(RANDOM_SEED_CH);
+    Node_ID_INT =  random(ID_MIN_LIMIT,ID_MAX_LIMIT);
+    
+    EEPROM.put(NODE_ID_ADDRESS,Node_ID_INT);   
+    delay(EEP_WRITE_WAIT);
+  }
+  Node_ID = STR(Node_ID_INT,HEX);       
+  return Node_ID;
 }
 //---------------------------------------------------------------
 //////////受信データがあればデータ数を格納、フラグTrue返却////////

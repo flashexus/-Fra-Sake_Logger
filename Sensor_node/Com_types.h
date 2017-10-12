@@ -15,9 +15,18 @@ public:
   COM();
   void Start(void);
   void SendTmpData(FLOAT SendData);
+  void RelayComData(void);
+  BOOL RcvTmpData(void);
+  BOOL CheckRcvData(void);
 private: 
   COM_TMP_DATA ComTmpData;
-  void PackTxData(FLOAT SendData);  
+  void PackTxData(FLOAT SendData); 
+  STR GetIDData(void);
+  STR ComRxData;
+  UINT RxData_cnt;
+  CHAR RxData_buffer[MAX_DATA_SIZE];
+  void UnPackRxData(void);
+  BOOL ValidateRxData(void);
+  BOOL GetData(void);  
 };
-
 #endif //COM_TYPES_H

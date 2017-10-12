@@ -6,7 +6,7 @@
 typedef struct{
   STR   HeaderData;
   FLOAT TmpData;
-  STR   SensorID;
+  STR SensorID;
 }COM_TMP_DATA;    //*end code = CRLF
 
 //---------------------------------------------------------------
@@ -19,13 +19,14 @@ public:
   BOOL RcvTmpData(void);
   BOOL CheckRcvData(void);
 private: 
-  COM_TMP_DATA ComTxData;
+  COM_TMP_DATA ComTmpData;
+  void PackTxData(FLOAT SendData); 
+  STR GetIDData(void);
   STR ComRxData;
   UINT RxData_cnt;
   CHAR RxData_buffer[MAX_DATA_SIZE];
-  void PackTxData(FLOAT SendData);
   void UnPackRxData(void);
   BOOL ValidateRxData(void);
-  BOOL GetData(void);
+  BOOL GetData(void);  
 };
 #endif //COM_TYPES_H

@@ -4,12 +4,12 @@
 //---------------------------------------------------------------
 #define task1()       Task_Sensing()
 #define WDT_CNT_TIME  4                   //秒単位設定
-#define TASK1_TIME    56                   //秒単位設定 誤差調整含む
+#define TASK1_TIME    5                   //秒単位設定 誤差調整含む
 //---------------------------------------------------------------
-volatile BOOL wakeUpflag;                 //Instance
+volatile BOOL wakeUpflag;                 
 //---------------------------------------------------------------
 
-TASK Task;
+TASK Task;                                //Instance
 //---------------------------------------------------------------
 TASK::TASK():
      Task1_exec_flag(false),Task_schTimer(0),Task_exec_time(TASK1_TIME),Task_UpdateCnt(WDT_CNT_TIME)
